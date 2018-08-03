@@ -1,20 +1,41 @@
 import requests
 import subprocess
-import time
+import time, sys
 
 print("Welcome to Distributed Nano Proof of Work System")
 address = input("Please enter your payout address: ")
 print("All payouts will go to %s" % address)
+pow_source = int(input("Select PoW Source, 0 = local, 1 = node: "))
+if pow_source > 1:
+    print("Incorrect Entry, Exiting")
+    sys.exit()
 
 while 1:
     r = requests.get('http://178.62.11.37/request_work')
-    if r.text != "No Work":
-        result = subprocess.check_output(["./mpow", r.text])
+    hash_result = r.json()
+    if hash_result['hash'] != "error":
+        if pow_source == 0:
+            try:
+                result = subprocess.check_output(["./mpow", hash_result['hash']])
+                work = result.decode().rstrip('\n\r')
+                print(work)
 
-        work = result.decode().rstrip('\n\r')
-        print(work)
+            except:
+                print("Error - no mpow binary")
+                sys.exit()
 
-        r = requests.post('http://178.62.11.37/return_work', data = {'hash':r.text, 'work':work, 'address':address})
+        elif pow_source == 1:
+            try:
+                rai_node_address = 'http://%s:%s' % ('127.0.0.1', '7076')
+                get_work = '{ "action" : "work_generate", "hash" : "%s", "use_peers": "true" }' % hash_result['hash']
+                r = requests.post(rai_node_address, data = get_work)
+                resulting_work = r.json()
+                work = resulting_work['work'].lower()
+            except:
+                print("Error - failed to connect to node")
+                sys.exit()
+
+        r = requests.post('http://178.62.11.37/return_work', data = {'hash': hash_result['hash'], 'work':work, 'address':address})
         print(r.text)
 
     time.sleep(20)
