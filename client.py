@@ -41,6 +41,7 @@ while 1:
         r = requests.post('http://178.62.11.37/return_work', data = json_request)
         print(r.text)
 
-    time.sleep(20)
   except:
     print("Error")
+
+  time.sleep(5)
