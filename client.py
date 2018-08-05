@@ -10,7 +10,10 @@ if pow_source > 1:
     print("Incorrect Entry, Exiting")
     sys.exit()
 
+print("Waiting for work...")
+
 while 1:
+  try:
     r = requests.get('http://178.62.11.37/request_work')
     hash_result = r.json()
     if hash_result['hash'] != "error":
@@ -34,8 +37,10 @@ while 1:
             except:
                 print("Error - failed to connect to node")
                 sys.exit()
-
-        r = requests.post('http://178.62.11.37/return_work', data = {'hash': hash_result['hash'], 'work':work, 'address':address})
+        json_request = '{"hash" : "%s", "work" : "%s", "address" : "%s"}' % (hash_result['hash'], work, address)
+        r = requests.post('http://178.62.11.37/return_work', data = json_request)
         print(r.text)
 
     time.sleep(20)
+  except:
+    print("Error")
