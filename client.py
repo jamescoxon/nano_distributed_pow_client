@@ -18,14 +18,13 @@ if pow_source > 1:
     print("Incorrect Entry, Exiting")
     sys.exit()
 
-print("Waiting for work...")
-
+print("Waiting for work...", end='', flush=True)
 while 1:
   try:
     r = requests.get('http://178.62.11.37/request_work')
-    print("Got work")
     hash_result = r.json()
     if hash_result['hash'] != "error":
+        print("\nGot work")
         if pow_source == 0:
             try:
                 result = subprocess.check_output(["./mpow", hash_result['hash']])
@@ -52,6 +51,7 @@ while 1:
         json_request = '{"hash" : "%s", "work" : "%s", "address" : "%s"}' % (hash_result['hash'], work, address)
         r = requests.post('http://178.62.11.37/return_work', data = json_request)
         print(r.text)
+        print("Waiting for work...", end='', flush=True)
 
   except KeyboardInterrupt:
       print("\nCtrl-C detected, canceled by user")
@@ -59,3 +59,4 @@ while 1:
       print("Error: {}".format(e))
 
   time.sleep(5)
+  print('.', end='', flush=True)
