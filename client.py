@@ -3,7 +3,15 @@ import subprocess
 import time, sys
 
 print("Welcome to Distributed Nano Proof of Work System")
-address = input("Please enter your payout address: ")
+address = ''
+try:
+    with open('address.txt') as f:
+        address = f.readline().strip()
+except Exception as e:
+    pass
+
+if(len(address) == 0):
+    address = input("Please enter your payout address: ")
 print("All payouts will go to %s" % address)
 pow_source = int(input("Select PoW Source, 0 = local, 1 = node: "))
 if pow_source > 1:
@@ -15,6 +23,7 @@ print("Waiting for work...")
 while 1:
   try:
     r = requests.get('http://178.62.11.37/request_work')
+    print("Got work")
     hash_result = r.json()
     if hash_result['hash'] != "error":
         if pow_source == 0:
@@ -23,6 +32,9 @@ while 1:
                 work = result.decode().rstrip('\n\r')
                 print(work)
 
+            except KeyboardInterrupt:
+                print("\nCtrl-C detected, canceled by user")
+                break;
             except:
                 print("Error - no mpow binary")
                 sys.exit()
@@ -41,7 +53,9 @@ while 1:
         r = requests.post('http://178.62.11.37/return_work', data = json_request)
         print(r.text)
 
-  except:
-    print("Error")
+  except KeyboardInterrupt:
+      print("\nCtrl-C detected, canceled by user")
+  except Exception as e:
+      print("Error: {}".format(e))
 
   time.sleep(5)
