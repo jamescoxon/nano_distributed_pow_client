@@ -22,6 +22,10 @@ print("Waiting for work...", end='', flush=True)
 while 1:
   try:
     r = requests.get('http://178.62.11.37/request_work')
+    if not r.ok:
+        print("Server request error {} - {}".format(r.status_code, r.reason))
+        time.sleep(10)
+        continue
     hash_result = r.json()
     if hash_result['hash'] != "error":
         print("\nGot work")
@@ -30,8 +34,6 @@ while 1:
             try:
                 result = subprocess.check_output(["./mpow", hash_result['hash']])
                 work = result.decode().rstrip('\n\r')
-                print("{} - took {:.2f}s".format(work, time.time()-t))
-
             except KeyboardInterrupt:
                 print("\nCtrl-C detected, canceled by user")
                 break;
@@ -49,6 +51,7 @@ while 1:
             except:
                 print("Error - failed to connect to node")
                 sys.exit()
+        print("{} - took {:.2f}s".format(work, time.time()-t))
         json_request = '{"hash" : "%s", "work" : "%s", "address" : "%s"}' % (hash_result['hash'], work, address)
         r = requests.post('http://178.62.11.37/return_work', data = json_request)
         print(r.text)
