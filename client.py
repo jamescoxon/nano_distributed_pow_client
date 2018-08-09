@@ -25,11 +25,12 @@ while 1:
     hash_result = r.json()
     if hash_result['hash'] != "error":
         print("\nGot work")
+        t = time.time()
         if pow_source == 0:
             try:
                 result = subprocess.check_output(["./mpow", hash_result['hash']])
                 work = result.decode().rstrip('\n\r')
-                print(work)
+                print("{} - took {:.2f}s".format(work, time.time()-t))
 
             except KeyboardInterrupt:
                 print("\nCtrl-C detected, canceled by user")
