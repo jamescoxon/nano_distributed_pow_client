@@ -83,50 +83,50 @@ size_t hex2bin(const char *hex, unsigned char **out)
     return len;
 }
 
-int main(int argc, char *argv[]){
-	unsigned char *str;
+const char *pow_generate(char *hash){
+	unsigned char *str, *work;
 	int i=0;
 
-    if(argc>= 2){
-		hex2bin(argv[1], &str);
+	hex2bin(hash, &str);
 
-		#pragma omp parallel
-		do{
-			blake2b_state b2b;
+	#pragma omp parallel
+	while(i==0){
+		unsigned char *r_str, *b2b_b, *b2b_h;
+		int fd = open("/dev/urandom", O_RDONLY);
+		blake2b_state b2b;
 
-			unsigned char *r_str, *b2b_b, *b2b_h;
-			r_str = malloc(9);
-			b2b_b = malloc(9);
+		r_str = malloc(9);
+		b2b_b = malloc(9);
+		r_str[8]='\0';
+		b2b_b[8]='\0';
 
-			int fd = open("/dev/urandom", O_RDONLY);
-			read(fd, r_str, 8);
-			r_str[8]='\0';
-			close(fd);
-			for(int j=0;j<256;j++){
-				r_str[7]=(r_str[7]+j)%256;
+		read(fd, r_str, 8);
+		close(fd);
+		for(int j=0;j<256&&i==0;j++){
+			r_str[7]=(r_str[7]+j)%256;
 
-				blake2b_init(&b2b, 8);
-				blake2b_update(&b2b, r_str, 8);
-				blake2b_update(&b2b, str, 32);
-				blake2b_final( &b2b, b2b_b, 8);
-				b2b_b[8]='\0';
+			blake2b_init(&b2b, 8);
+			blake2b_update(&b2b, r_str, 8);
+			blake2b_update(&b2b, str, 32);
+			blake2b_final( &b2b, b2b_b, 8);
 
-				strrev(b2b_b);
+			strrev(b2b_b);
 
-				b2b_h=bin2hex(b2b_b, 8);
+			b2b_h=bin2hex(b2b_b, 8);
 
-				if(strcmp( b2b_h , "ffffffc000000000")>0){
-					free(b2b_h);
-					i++;
-					strrev(r_str);
-					printf("%s\n",bin2hex(r_str, 8));
-				}
-				free(b2b_h);
+			if(strcmp( b2b_h , "ffffffc000000000")>0){
+				strrev(r_str);
+				work=bin2hex(r_str, 8);
+				i++;
 			}
-			free(r_str);
-			free(b2b_b);
-		}while(i==0);
-
+			free(b2b_h);
+		}
+		free(r_str);
+		free(b2b_b);
 	}
-    return 0;
+    return work;
+}
+
+int main(int argc, char *argv[]){
+    if(argc> 1) printf("%s\n", pow_generate(argv[1]));
 }
