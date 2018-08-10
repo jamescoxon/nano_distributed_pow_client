@@ -18,9 +18,8 @@ make
 Optionally, compile executable 
 `make mpow`
 
-```
+```bash
 python3 client.py
-
 # Choose to compute PoW locally
 ```
 
@@ -42,6 +41,6 @@ python3 client.py
 # Choose to connect to the node
 ```
 
-## Tips
+## Configuration
 
-Save your address in `address.txt` so the client doesn't ask for it every time it starts
+You can optionally save your address in `client.conf`.
