@@ -10,12 +10,14 @@
 ```bash
 cd nano_distributed_pow_client
 sudo apt-get install libb2-dev
+autoconf
+./configure
+make
 ```
-Compile library 
-`gcc -lb2 -fopenmp -shared -Wl,-soname,libmpow -o libmpow.so -fPIC mpow.c`
 
 Optionally, compile executable 
-`gcc -o mpow mpow.c -lb2 -fopenmp`
+`make mpow`
+
 ```
 python3 client.py
 
