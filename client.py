@@ -1,14 +1,13 @@
-import requests
-import subprocess
-import time, sys
+import requests, argparse, ctypes, time, sys
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--address', type=str, required=True, metavar='XRB/NANO_ADDRESS', help='Payout address.')
+parser.add_argument('--node', action='store_true', help='Compute work on the node. Default is to use libmpow.')
+args = parser.parse_args()
 
 print("Welcome to Distributed Nano Proof of Work System")
-address = input("Please enter your payout address: ")
-print("All payouts will go to %s" % address)
-pow_source = int(input("Select PoW Source, 0 = local, 1 = node: "))
-if pow_source > 1:
-    print("Incorrect Entry, Exiting")
-    sys.exit()
+
+print("All payouts will go to %s" % args.address)
 
 print("Waiting for work...")
 
@@ -17,17 +16,18 @@ while 1:
     r = requests.get('http://178.62.11.37/request_work')
     hash_result = r.json()
     if hash_result['hash'] != "error":
-        if pow_source == 0:
+        if not args.node:
             try:
-                result = subprocess.check_output(["./mpow", hash_result['hash']])
-                work = result.decode().rstrip('\n\r')
+                lib=ctypes.CDLL("./libmpow.so")
+                lib.pow_generate.restype = ctypes.c_char_p
+                work = lib.pow_generate(ctypes.c_char_p(hash_result['hash'].encode("utf-8"))).decode("utf-8")
                 print(work)
 
             except:
                 print("Error - no mpow binary")
                 sys.exit()
 
-        elif pow_source == 1:
+        else:
             try:
                 rai_node_address = 'http://%s:%s' % ('127.0.0.1', '7076')
                 get_work = '{ "action" : "work_generate", "hash" : "%s", "use_peers": "true" }' % hash_result['hash']
@@ -37,7 +37,7 @@ while 1:
             except:
                 print("Error - failed to connect to node")
                 sys.exit()
-        json_request = '{"hash" : "%s", "work" : "%s", "address" : "%s"}' % (hash_result['hash'], work, address)
+        json_request = '{"hash" : "%s", "work" : "%s", "address" : "%s"}' % (hash_result['hash'], work, args.address)
         r = requests.post('http://178.62.11.37/return_work', data = json_request)
         print(r.text)
 
