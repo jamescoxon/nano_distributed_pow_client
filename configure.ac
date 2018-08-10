@@ -1,0 +1,7 @@
+AC_INIT()
+AC_LANG(C)
+AC_PROG_CC([gcc-8 gcc])
+AC_CHECK_HEADERS(blake2.h, [], [AC_ERROR([blake2 headers missing.])])
+AC_CHECK_LIB(b2, blake2b_init, [], [AC_ERROR([blake2 library missing.])])
+AC_OPENMP()
+AC_OUTPUT(makefile)
