@@ -14,13 +14,12 @@ if(len(address) == 0):
     args = parser.parse_args()
     
     address = args.address
-    pow_souce = args.node
 
 print("Welcome to Distributed Nano Proof of Work System")
 print("All payouts will go to %s" % address)
-if pow_souce == 0:
+if not args.node:
     print("You have selected local PoW processor (libmpow)")
-elif pow_source == 1:
+else:
     print("You have selected node PoW processor (work_server or nanocurrency node)")
 
 print("Waiting for work...", end='', flush=True)
@@ -35,7 +34,7 @@ while 1:
     if hash_result['hash'] != "error":
         print("\nGot work")
         t = time.time()
-        if pow_source == 0:
+        if not args.node:
             try:
                 lib=ctypes.CDLL("./libmpow.so")
                 lib.pow_generate.restype = ctypes.c_char_p
@@ -60,8 +59,6 @@ while 1:
                 sys.exit()
         print("{} - took {:.2f}s".format(work, time.time()-t))
         json_request = '{"hash" : "%s", "work" : "%s", "address" : "%s"}' % (hash_result['hash'], work, address)
-
-        json_request = '{"hash" : "%s", "work" : "%s", "address" : "%s"}' % (hash_result['hash'], work, args.address)
 
         r = requests.post('http://178.62.11.37/return_work', data = json_request)
         print(r.text)
