@@ -12,8 +12,7 @@ except:
 	pass
 
 parser = argparse.ArgumentParser()
-if(len(address) == 0): parser.add_argument('--address', type=str, required=True, metavar='XRB/NANO_ADDRESS', help='Payout address.')
-else: parser.add_argument('--address', type=str, metavar='XRB/NANO_ADDRESS', help='Payout address.')
+parser.add_argument('--address', type=str, required=(len(address)==0), metavar='XRB/NANO_ADDRESS', help='Payout address.')
 parser.add_argument('--node', action='store_true', help='Compute work on the node. Default is to use libmpow.')
 args = parser.parse_args()
 
