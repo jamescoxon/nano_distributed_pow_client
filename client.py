@@ -33,7 +33,7 @@ while 1:
     hash_result = r.json()
     if hash_result['hash'] != "error":
         print("\nGot work")
-        t = time.time()
+        t = time.perf_counter()
         if not args.node:
             try:
                 lib=ctypes.CDLL("./libmpow.so")
@@ -57,7 +57,7 @@ while 1:
             except:
                 print("Error - failed to connect to node")
                 sys.exit()
-        print("{} - took {:.2f}s".format(work, time.time()-t))
+        print("{} - took {:.2f}s".format(work, time.perf_counter()-t))
         json_request = '{"hash" : "%s", "work" : "%s", "address" : "%s"}' % (hash_result['hash'], work, address)
 
         r = requests.post('http://178.62.11.37/return_work', data = json_request)
