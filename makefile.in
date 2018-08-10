@@ -1,0 +1,13 @@
+CC=@CC@
+CFLAGS=@CFLAGS@ @OPENMP_CFLAGS@
+LFLAGS=@LIBS@
+MACROS=@DEFS@
+
+libmpow:
+	$(CC) $(CFLAGS) $(LFLAGS) $(MACROS) -fPIC mpow.c -shared -o libmpow.so
+	
+mpow:
+	$(CC) $(CFLAGS) $(LFLAGS) $(MACROS) mpow.c -o mpow
+
+clean:
+	rm -f mpow libmpow.so
