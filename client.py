@@ -1,19 +1,22 @@
-import requests, argparse, ctypes, time, sys
+import requests, argparse, ctypes, time, sys, configparser
+
 
 address = ''
+
+config = configparser.ConfigParser()
 try:
-    with open('address.txt') as f:
-        address = f.readline().strip()
-except Exception as e:
-    pass
-  
-if(len(address) == 0):
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--address', type=str, required=True, metavar='XRB/NANO_ADDRESS', help='Payout address.')
-    parser.add_argument('--node', action='store_true', help='Compute work on the node. Default is to use libmpow.')
-    args = parser.parse_args()
-    
-    address = args.address
+	config.read('client.conf')
+	if 'DEFAULT' in config:
+		if 'address' in config['DEFAULT']: address=config['DEFAULT']['address']
+except:
+	pass
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--address', type=str, required=(len(address)==0), metavar='XRB/NANO_ADDRESS', help='Payout address.')
+parser.add_argument('--node', action='store_true', help='Compute work on the node. Default is to use libmpow.')
+args = parser.parse_args()
+
+if args.address: address = args.address
 
 print("Welcome to Distributed Nano Proof of Work System")
 print("All payouts will go to %s" % address)
