@@ -10,8 +10,15 @@
 ```bash
 cd nano_distributed_pow_client
 sudo apt-get install libb2-dev
-gcc -o mpow mpow.c -lb2 -fopenmp
+```
+Compile library 
+`gcc -lb2 -fopenmp -shared -Wl,-soname,libmpow -o libmpow.so -fPIC mpow.c`
+
+Optionally, compile executable 
+`gcc -o mpow mpow.c -lb2 -fopenmp`
+```
 python3 client.py
+
 # Choose to compute PoW locally
 ```
 
