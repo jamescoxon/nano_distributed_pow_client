@@ -116,6 +116,7 @@ const char *pow_generate(char *hash){
 
 			if(strcmp( b2b_h , "ffffffc000000000")>0){
 				strrev(r_str);
+				#pragma omp atomic write
 				work=bin2hex(r_str, 8);
 				i++;
 			}
