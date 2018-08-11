@@ -5,8 +5,6 @@
 ### Ubuntu
 `git clone https://github.com/jamescoxon/nano_distributed_pow_client.git`
 
-#### Using CPU
-
 ```bash
 cd nano_distributed_pow_client
 sudo apt-get install libb2-dev
@@ -15,7 +13,15 @@ autoconf
 make
 ```
 
-Optionally, compile executable 
+To enable GPU,
+```
+sudo apt-get install ocl-icd-opencl-dev
+autoconf
+./configure --enable-gpu
+make
+```.
+
+Optionally, compile executable
 `make mpow`
 
 ```bash
