@@ -9,8 +9,8 @@
 #ifdef HAVE_OPENCL_CL_H
 #include<OpenCL/opencl.h>
 #elif HAVE_CL_CL_H
-//~ #include<CL/opencl.h>
-#include<CL/cl_intel.h>
+#include<CL/opencl.h>
+//~ #include<CL/cl_intel.h>
 #endif
 
 #if defined(HAVE_OPENCL_CL_H) || defined(HAVE_CL_CL_H)
