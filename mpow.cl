@@ -1,3 +1,4 @@
+// this file is the variable opencl_program in raiblocks/rai/node/openclwork.cpp
 enum blake2b_constant
 {
 	BLAKE2B_BLOCKBYTES = 128,

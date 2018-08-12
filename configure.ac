@@ -10,4 +10,5 @@ AC_CHECK_HEADERS([CL/cl.h OpenCL/cl.h])
 AC_CHECK_LIB(CL, clGetPlatformIDs, [], [])
 AC_CHECK_LIB(OpenCL, clGetPlatformIDs, [], [])
 ])
+CFLAGS="$CFLAGS -Wall"
 AC_OUTPUT(makefile)
