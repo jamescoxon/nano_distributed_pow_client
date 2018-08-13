@@ -13,10 +13,6 @@
 //~ #include<CL/cl_intel.h>
 #endif
 
-#if defined(HAVE_OPENCL_CL_H) || defined(HAVE_CL_CL_H)
-// this variable has the same definition as in raiblocks/rai/node/openclwork.cpp
-#endif
-
 void swapLong(uint64_t *X){
 	uint64_t x = *X;
 	x = (x & 0x00000000FFFFFFFF) << 32 | (x & 0xFFFFFFFF00000000) >> 32;
@@ -75,7 +71,7 @@ void pow_omp(uint8_t *str, char *work){
 
 		read(fd, &r_str, 8);
 		close(fd);
-		for(int j=0;j<256&&i==0;j++){
+		for(int j=0;j<(1024*1024)&&i==0;j++){
 			r_str+=j;
 
 			blake2b_init(&b2b, 8);
@@ -110,7 +106,7 @@ char *pow_generate(char *hash){
 		int i=0;
 		char *opencl_program;
 		size_t length;
-		const size_t work_size = 10000; // find optimal value
+		const size_t work_size = 1024*1024; // default value from nano
 		uint64_t workb=0, r_str=0;
 		FILE *f;
 		cl_mem d_rand, d_work, d_str;
@@ -176,12 +172,12 @@ char *pow_generate(char *hash){
 			read(fd, &r_str, 8);
 			close(fd);
 
-			clEnqueueWriteBuffer(queue, d_rand, CL_TRUE, 0, 8, &r_str, 0, NULL, NULL );
-			clEnqueueWriteBuffer(queue, d_str, CL_TRUE, 0, 32, str, 0, NULL, NULL );
+			clEnqueueWriteBuffer(queue, d_rand, CL_FALSE, 0, 8, &r_str, 0, NULL, NULL );
+			clEnqueueWriteBuffer(queue, d_str, CL_FALSE, 0, 32, str, 0, NULL, NULL );
 
 			clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &work_size, NULL, 0, NULL, NULL);
 
-			clEnqueueReadBuffer(queue, d_work, CL_TRUE, 0, 8, &workb, 0, NULL, NULL );
+			clEnqueueReadBuffer(queue, d_work, CL_FALSE, 0, 8, &workb, 0, NULL, NULL );
 
 			clFinish(queue);
 
@@ -208,5 +204,10 @@ char *pow_generate(char *hash){
 }
 
 int main(int argc, char *argv[]){
-    if(argc> 1) printf("%s\n", pow_generate(argv[1]));
+    if(argc> 1){
+		char *work;
+		work=pow_generate(argv[1]);
+		printf("%s\n", work);
+		free(work);
+	}
 }
