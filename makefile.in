@@ -4,10 +4,10 @@ LFLAGS=@LIBS@
 MACROS=@DEFS@
 
 libmpow:
-	$(CC) -shared -o libmpow.so $(CFLAGS) $(LFLAGS) $(MACROS) -fPIC mpow.c
+	$(CC) -shared -o libmpow.so $(MACROS) -fPIC mpow.c $(CFLAGS) $(LFLAGS)
 	
 mpow:
-	$(CC) -o mpow $(CFLAGS) $(LFLAGS) $(MACROS) mpow.c
+	$(CC) -o mpow $(MACROS) mpow.c $(CFLAGS) $(LFLAGS)
 
 clean:
 	rm -rf autom4te.cache configure config.log config.status
