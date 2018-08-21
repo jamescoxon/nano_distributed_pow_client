@@ -1,17 +1,18 @@
 CC=@CC@
 CFLAGS=@CFLAGS@ @OPENMP_CFLAGS@
+LDFLAGS=@LDFLAGS@
 LFLAGS=@LIBS@
 MACROS=@DEFS@
 
 libmpow:
-	$(CC) -shared -o libmpow.so $(MACROS) -fPIC mpow.c $(CFLAGS) $(LFLAGS)
-	
+	$(CC) $(CFLAGS) -shared -o libmpow.so -fPIC mpow.c ${LDFLAGS} $(LFLAGS) $(MACROS)
+
 mpow:
-	$(CC) -o mpow $(MACROS) mpow.c $(CFLAGS) $(LFLAGS)
+	$(CC) $(CFLAGS) -o mpow mpow.c ${LDFLAGS} $(LFLAGS) $(MACROS)
 
 clean:
 	rm -rf autom4te.cache configure config.log config.status
 
 clean_all:
 	make clean
-	rm -rf mpow libmpow.so
+	rm -rf mpow mpow.cl.bin libmpow.so
