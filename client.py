@@ -1,5 +1,6 @@
-import requests, argparse, ctypes, time, sys, configparser
-
+import requests, argparse, ctypes, time, sys, configparser, json
+import websocket #websockets-client
+from websocket import create_connection
 
 address = ''
 
@@ -25,15 +26,19 @@ if not args.node:
 else:
     print("You have selected node PoW processor (work_server or nanocurrency node)")
 
+node_server = 'ws://yapraiwallet.space:5000/group/'
+
+try:
+    ws = create_connection(node_server)
+except:
+    print('\nError - unable to connect to backend server\nTry again later or change the server in config.ini')
+    sys.exit()
+
 print("Waiting for work...", end='', flush=True)
 while 1:
   try:
-    r = requests.get('http://178.62.11.37/request_work')
-    if not r.ok:
-        print("Server request error {} - {}".format(r.status_code, r.reason))
-        time.sleep(10)
-        continue
-    hash_result = r.json()
+    hash_result = json.loads(str(ws.recv()))
+
     if hash_result['hash'] != "error":
         print("\nGot work")
         t = time.perf_counter()
@@ -61,10 +66,10 @@ while 1:
                 print("Error - failed to connect to node")
                 sys.exit()
         print("{} - took {:.2f}s".format(work, time.perf_counter()-t))
+        
         json_request = '{"hash" : "%s", "work" : "%s", "address" : "%s"}' % (hash_result['hash'], work, address)
+        ws.send(json_request)
 
-        r = requests.post('http://178.62.11.37/return_work', data = json_request)
-        print(r.text)
         print("Waiting for work...", end='', flush=True)
 
   except KeyboardInterrupt:
