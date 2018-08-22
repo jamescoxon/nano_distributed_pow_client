@@ -5,9 +5,9 @@
 #include<fcntl.h>
 
 #ifdef HAVE_OPENCL_CL_H
-#include<OpenCL/opencl.h>
+#include<OpenCL/cl.h>
 #elif HAVE_CL_CL_H
-#include<CL/opencl.h>
+#include<CL/cl.h>
 #else
 #include<omp.h>
 #include<blake2.h>
