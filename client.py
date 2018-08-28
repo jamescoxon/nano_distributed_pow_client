@@ -1,5 +1,5 @@
 import requests, argparse, ctypes, time, sys, configparser, json
-import websocket #websockets-client
+import websocket #websocket-client
 from websocket import create_connection
 
 address = ''
