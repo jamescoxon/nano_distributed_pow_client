@@ -19,7 +19,7 @@ sudo apt-get install ocl-icd-opencl-dev
 autoconf
 ./configure --enable-gpu
 make
-```.
+```
 
 Optionally, compile executable
 `make mpow`
