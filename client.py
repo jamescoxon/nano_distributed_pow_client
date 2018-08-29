@@ -76,7 +76,13 @@ while 1:
       print("\nCtrl-C detected, canceled by user")
   except Exception as e:
       print("Error: {}".format(e))
-      ws = create_connection(node_server)
+      print("Reconnecting...")
+      time.sleep(15)
+      try:
+          ws = create_connection(node_server)
+          print("Connected")
+      except:
+          pass
 
   time.sleep(5)
   print('.', end='', flush=True)
