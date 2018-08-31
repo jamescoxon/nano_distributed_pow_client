@@ -119,15 +119,20 @@ char *pow_generate(char *hash){
 
 #if defined(HAVE_OPENCL_CL_H) || defined(HAVE_CL_CL_H)
 	cl_platform_id cpPlatform;
+	int err;
 	cl_uint num;
 
-	clGetPlatformIDs(1, &cpPlatform, &num);
-	if(num==0){
+	err=clGetPlatformIDs(1, &cpPlatform, &num);
+	if(err!=CL_SUCCESS){
+		printf("clGetPlatformIDs failed with error code %d\n",err);
+		goto FAIL;
+	}
+	else if(num==0) {
 		printf("clGetPlatformIDs failed to find a gpu device\n");
 		goto FAIL;
 	}
 	else{
-		int i=0, err;
+		int i=0;
 		char *opencl_program;
 		size_t length;
 		const size_t work_size = WORK_SIZE; // default value from nano
