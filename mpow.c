@@ -1,8 +1,7 @@
 #include<stdlib.h>
 #include<stdio.h>
-#include<unistd.h>
 #include<string.h>
-#include<fcntl.h>
+#include<time.h>
 
 #ifdef HAVE_OPENCL_CL_H
 #include<OpenCL/cl.h>
@@ -15,69 +14,18 @@
 
 #define WORK_SIZE 1024*1024
 
-///////////////////////////////////////////////////////////////////////////////////
-// 64-bit version of Mersenne Twister pseudorandom number generator.
-// http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/VERSIONS/C-LANG/mt19937-64.c
-///////////////////////////////////////////////////////////////////////////////////
+static uint64_t s[16];
+static int p;
 
-#define NN 312
-#define MM 156
-#define MATRIX_A 0xB5026F5AA96619E9ULL
-#define UM 0xFFFFFFFF80000000ULL /* Most significant 33 bits */
-#define LM 0x7FFFFFFFULL /* Least significant 31 bits */
-
-/* The array for the state vector */
-static unsigned long long mt[NN];
-/* mti==NN+1 means mt[NN] is not initialized */
-static int mti=NN+1;
-
-/* initializes mt[NN] with a seed */
-void init_genrand64(unsigned long long seed)
-{
-    mt[0] = seed;
-    for (mti=1; mti<NN; mti++)
-        mt[mti] =  (6364136223846793005ULL * (mt[mti-1] ^ (mt[mti-1] >> 62)) + mti);
+uint64_t xorshift1024star(void) {  // raiblocks/rai/node/xorshift.hpp
+	const uint64_t s0 = s[p++];
+	uint64_t s1 = s[p &= 15];
+	s1 ^= s1 << 31;         // a
+	s1 ^= s1 >> 11;         // b
+	s1 ^= s0 ^ (s0 >> 30);  // c
+	s[p] = s1;
+	return s1 * (uint64_t)1181783497276652981;
 }
-
-/* generates a random number on [0, 2^64-1]-interval */
-unsigned long long genrand64_int64(void)
-{
-    int i;
-    unsigned long long x;
-    static unsigned long long mag01[2]={0ULL, MATRIX_A};
-
-    if (mti >= NN) { /* generate NN words at one time */
-
-        /* if init_genrand64() has not been called, */
-        /* a default initial seed is used     */
-        if (mti == NN+1)
-            init_genrand64(5489ULL);
-
-        for (i=0;i<NN-MM;i++) {
-            x = (mt[i]&UM)|(mt[i+1]&LM);
-            mt[i] = mt[i+MM] ^ (x>>1) ^ mag01[(int)(x&1ULL)];
-        }
-        for (;i<NN-1;i++) {
-            x = (mt[i]&UM)|(mt[i+1]&LM);
-            mt[i] = mt[i+(MM-NN)] ^ (x>>1) ^ mag01[(int)(x&1ULL)];
-        }
-        x = (mt[NN-1]&UM)|(mt[0]&LM);
-        mt[NN-1] = mt[MM-1] ^ (x>>1) ^ mag01[(int)(x&1ULL)];
-
-        mti = 0;
-    }
-
-    x = mt[mti++];
-
-    x ^= (x >> 29) & 0x5555555555555555ULL;
-    x ^= (x << 17) & 0x71D67FFFEDA60000ULL;
-    x ^= (x << 37) & 0xFFF7EEE000000000ULL;
-    x ^= (x >> 43);
-
-    return x;
-}
-
-///////////////////////////////////////////////////////////////////////////////////
 
 void swapLong(uint64_t *X){
 	uint64_t x = *X;
@@ -131,7 +79,7 @@ void pow_omp(uint8_t *str, char *work){
 	int i=0;
 	uint64_t r_str=0;
 	while(i==0){
-		r_str=genrand64_int64();
+		r_str=xorshift1024star();
 		#pragma omp parallel
 		#pragma omp for
 		for(int j=0;j<WORK_SIZE;j++){
@@ -162,14 +110,12 @@ void pow_omp(uint8_t *str, char *work){
 char *pow_generate(char *hash){
 	char *work=malloc(17);
 	uint8_t *str;
-	uint64_t mt_seed=0;
 
 	hex2bin(hash, &str);
 
-	int fd = open("/dev/urandom", O_RDONLY);
-	read(fd, &mt_seed, 8);
-	close(fd);
-	init_genrand64(mt_seed);
+	srand(time(NULL));
+	for (int i = 0; i < 16; i++)
+		for (int j = 0; j < 4; j++) ((uint16_t *)&s[i])[j] = rand();
 
 #if defined(HAVE_OPENCL_CL_H) || defined(HAVE_CL_CL_H)
 	cl_platform_id cpPlatform;
@@ -272,7 +218,7 @@ char *pow_generate(char *hash){
 		}
 
 		while(i==0){
-			r_str=genrand64_int64();
+			r_str=xorshift1024star();
 
 			err=clEnqueueWriteBuffer(queue, d_rand, CL_FALSE, 0, 8, &r_str, 0, NULL, NULL );
 			if (err!=CL_SUCCESS) {
