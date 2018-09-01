@@ -3,7 +3,7 @@ AC_LANG(C)
 AC_PROG_CC([gcc-8 gcc])
 AC_ARG_ENABLE([gpu], AS_HELP_STRING([--enable-gpu], [Enable GPU use]))
 AS_IF([test "x$enable_gpu" = "xyes"], [
-AC_CHECK_HEADERS([CL/cl.h OpenCL/cl.h])
+AC_CHECK_HEADERS([CL/cl.h OpenCL/opencl.h])
 AC_CHECK_LIB(CL, clGetPlatformIDs, [], [])
 AC_CHECK_LIB(OpenCL, clGetPlatformIDs, [], [])
 ], [
