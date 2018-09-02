@@ -147,7 +147,7 @@ char *pow_generate(char *hash) {
       goto FAIL;
     }
 
-#if CL_TARGET_OPENCL_VERSION >= 200
+#ifndef __APPLE__
     cl_command_queue queue =
         clCreateCommandQueueWithProperties(context, device_id, 0, &err);
     if (err != CL_SUCCESS) {
