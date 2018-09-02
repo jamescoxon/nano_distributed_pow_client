@@ -127,7 +127,6 @@ while 1:
     except Exception as e:
         print("Error: {}".format(e))
         print("Reconnecting in 15 seconds...")
-        del ws
         time.sleep(15)
         try:
             ws = get_socket()
