@@ -1,103 +1,101 @@
 import requests, argparse, ctypes, time, sys, configparser, json
 import websocket #websocket-client, exceptions
 from websocket import create_connection
+from datetime import datetime # print timestamp
 
-def get_socket(addr):
-    ws = create_connection(addr)
+NODE_SERVER = 'ws://yapraiwallet.space:5000/group/'
+WORK_SERVER = 'http://%s:%s' % ('127.0.0.1', '7076')
+
+def get_socket():
+    ws = create_connection(NODE_SERVER)
     ws.settimeout(5.0) # this causes a TimeOutException after 5 seconds stuck in .recv()
     return ws
 
-address = ''
+def get_work_lib(from_hash):
+    lib=ctypes.CDLL("./libmpow.so")
+    lib.pow_generate.restype = ctypes.c_char_p
+    work = lib.pow_generate(ctypes.c_char_p(from_hash.encode("utf-8"))).decode("utf-8")
+    return work
+
+def get_work_node(from_hash):
+    get_work = '{ "action" : "work_generate", "hash" : "%s", "use_peers": "true" }' % from_hash
+    r = requests.post(WORK_SERVER, data = get_work)
+    resulting_work = r.json()
+    work = resulting_work['work'].lower()
+    return work
+
+# ---- MAIN ---- #
+
+payout_address = ''
 
 config = configparser.ConfigParser()
 try:
     config.read('client.conf')
     if 'DEFAULT' in config and 'address' in config['DEFAULT']:
-        address=config['DEFAULT']['address']
+        payout_address=config['DEFAULT']['address']
 except:
     pass
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--address', type=str, required=(len(address)==0), metavar='XRB/NANO_ADDRESS', help='Payout address.')
+parser.add_argument('--address', type=str, required=(len(payout_address)==0), metavar='XRB/NANO_ADDRESS', help='Payout address.')
 parser.add_argument('--node', action='store_true', help='Compute work on the node. Default is to use libmpow.')
 args = parser.parse_args()
 
-if args.address: address = args.address
+if args.address: payout_address = args.address
 
 print("Welcome to Distributed Nano Proof of Work System")
-print("All payouts will go to %s" % address)
+print("All payouts will go to %s" % payout_address)
 if not args.node:
     print("You have selected local PoW processor (libmpow)")
 else:
     print("You have selected node PoW processor (work_server or nanocurrency node)")
 
-node_server = 'ws://yapraiwallet.space:5000/group/'
-
 try:
-    ws = get_socket(node_server)
+    ws = get_socket()
 except Exception as e:
     print('\nError - unable to connect to backend server\nTry again later or change the server in config.ini')
     sys.exit()
 
-print("Waiting for work...", end='', flush=True)
+waiting = False
 while 1:
     try:
+        if not waiting:
+            print("Waiting for work...", end='', flush=True)
+            waiting = True
+
         try:
             hash_result = json.loads(str(ws.recv()))
         except websocket.WebSocketTimeoutException as e:
             print('.', end='', flush=True)
             continue
 
-        print("\nGot work")
+        waiting = False
+
+        print("\n{} \tGot work".format(datetime.now()))
         t = time.perf_counter()
 
         if not args.node:
-            try:
-                lib=ctypes.CDLL("./libmpow.so")
-                lib.pow_generate.restype = ctypes.c_char_p
-                work = lib.pow_generate(ctypes.c_char_p(hash_result['hash'].encode("utf-8"))).decode("utf-8")
-                print(work)
-            except Exception as e:
-                print("Error: {}".format(e))
-                sys.exit()
+            work = get_work_lib(hash_result['hash'])
         else:
-            try:
-                rai_node_address = 'http://%s:%s' % ('127.0.0.1', '7076')
-                get_work = '{ "action" : "work_generate", "hash" : "%s", "use_peers": "true" }' % hash_result['hash']
-                r = requests.post(rai_node_address, data = get_work)
-                resulting_work = r.json()
-                work = resulting_work['work'].lower()
-            except:
-                print("Error - failed to connect to node")
-                sys.exit()
+            work = get_work_node(hash_result['hash'])
 
-        print("{} - took {:.2f}s".format(work, time.perf_counter()-t))
+        print("\t\t\t\t{} - took {:.2f}s".format(work, time.perf_counter()-t))
 
-        try:
-            json_request = '{"hash" : "%s", "work" : "%s", "address" : "%s"}' % (hash_result['hash'], work, address)
-            ws.send(json_request)
-        except Exception as e:
-            print("Error: {}".format(e))
-
-        print("Waiting for work...", end='', flush=True)
+        json_request = '{"hash" : "%s", "work" : "%s", "address" : "%s"}' % (hash_result['hash'], work, payout_address)
+        ws.send(json_request)
 
     except KeyboardInterrupt:
         print("\nCtrl-C detected, canceled by user\n")
         break
 
-    except websocket.WebSocketException as e:
+    except Exception as e:
         print("Error: {}".format(e))
         print("Reconnecting in 15 seconds...")
+        del ws
         time.sleep(15)
         try:
-            ws = get_socket(node_server)
+            ws = get_socket()
             print("Connected")
         except:
             continue
 
-        print("Waiting for work...", end='', flush=True)
-
-
-    except Exception as e:
-        print("Error: {}".format(e))
-        break
