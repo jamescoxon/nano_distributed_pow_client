@@ -1,15 +1,21 @@
-import requests, argparse, ctypes, time, sys, configparser
+import requests, argparse, ctypes, time, sys, configparser, json
+import websocket #websocket-client, exceptions
+from websocket import create_connection
 
+def get_socket(addr):
+    ws = create_connection(addr)
+    ws.settimeout(5.0) # this causes a TimeOutException after 5 seconds stuck in .recv()
+    return ws
 
 address = ''
 
 config = configparser.ConfigParser()
 try:
-	config.read('client.conf')
-	if 'DEFAULT' in config:
-		if 'address' in config['DEFAULT']: address=config['DEFAULT']['address']
+    config.read('client.conf')
+    if 'DEFAULT' in config and 'address' in config['DEFAULT']:
+        address=config['DEFAULT']['address']
 except:
-	pass
+    pass
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--address', type=str, required=(len(address)==0), metavar='XRB/NANO_ADDRESS', help='Payout address.')
@@ -25,31 +31,35 @@ if not args.node:
 else:
     print("You have selected node PoW processor (work_server or nanocurrency node)")
 
+node_server = 'ws://yapraiwallet.space:5000/group/'
+
+try:
+    ws = get_socket(node_server)
+except Exception as e:
+    print('\nError - unable to connect to backend server\nTry again later or change the server in config.ini')
+    sys.exit()
+
 print("Waiting for work...", end='', flush=True)
 while 1:
-  try:
-    r = requests.get('http://178.62.11.37/request_work')
-    if not r.ok:
-        print("Server request error {} - {}".format(r.status_code, r.reason))
-        time.sleep(10)
-        continue
-    hash_result = r.json()
-    if hash_result['hash'] != "error":
+    try:
+        try:
+            hash_result = json.loads(str(ws.recv()))
+        except websocket.WebSocketTimeoutException as e:
+            print('.', end='', flush=True)
+            continue
+
         print("\nGot work")
         t = time.perf_counter()
+
         if not args.node:
             try:
                 lib=ctypes.CDLL("./libmpow.so")
                 lib.pow_generate.restype = ctypes.c_char_p
                 work = lib.pow_generate(ctypes.c_char_p(hash_result['hash'].encode("utf-8"))).decode("utf-8")
                 print(work)
-            except KeyboardInterrupt:
-                print("\nCtrl-C detected, canceled by user")
-                break;
             except Exception as e:
                 print("Error: {}".format(e))
                 sys.exit()
-
         else:
             try:
                 rai_node_address = 'http://%s:%s' % ('127.0.0.1', '7076')
@@ -60,17 +70,34 @@ while 1:
             except:
                 print("Error - failed to connect to node")
                 sys.exit()
-        print("{} - took {:.2f}s".format(work, time.perf_counter()-t))
-        json_request = '{"hash" : "%s", "work" : "%s", "address" : "%s"}' % (hash_result['hash'], work, address)
 
-        r = requests.post('http://178.62.11.37/return_work', data = json_request)
-        print(r.text)
+        print("{} - took {:.2f}s".format(work, time.perf_counter()-t))
+
+        try:
+            json_request = '{"hash" : "%s", "work" : "%s", "address" : "%s"}' % (hash_result['hash'], work, address)
+            ws.send(json_request)
+        except Exception as e:
+            print("Error: {}".format(e))
+
         print("Waiting for work...", end='', flush=True)
 
-  except KeyboardInterrupt:
-      print("\nCtrl-C detected, canceled by user")
-  except Exception as e:
-      print("Error: {}".format(e))
+    except KeyboardInterrupt:
+        print("\nCtrl-C detected, canceled by user\n")
+        break
 
-  time.sleep(5)
-  print('.', end='', flush=True)
+    except websocket.WebSocketException as e:
+        print("Error: {}".format(e))
+        print("Reconnecting in 15 seconds...")
+        time.sleep(15)
+        try:
+            ws = get_socket(node_server)
+            print("Connected")
+        except:
+            continue
+
+        print("Waiting for work...", end='', flush=True)
+
+
+    except Exception as e:
+        print("Error: {}".format(e))
+        break
