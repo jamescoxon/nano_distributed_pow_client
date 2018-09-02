@@ -147,18 +147,18 @@ char *pow_generate(char *hash) {
       goto FAIL;
     }
 
-#ifdef __APPLE__
-    cl_command_queue queue = clCreateCommandQueue(context, device_id, 0, &err);
-    if (err != CL_SUCCESS) {
-      printf("clCreateCommandQueue failed with error code %d\n", err);
-      goto FAIL;
-    }
-#else
+#if CL_TARGET_OPENCL_VERSION >= 200
     cl_command_queue queue =
         clCreateCommandQueueWithProperties(context, device_id, 0, &err);
     if (err != CL_SUCCESS) {
       printf("clCreateCommandQueueWithProperties failed with error code %d\n",
              err);
+      goto FAIL;
+    }
+#else
+    cl_command_queue queue = clCreateCommandQueue(context, device_id, 0, &err);
+    if (err != CL_SUCCESS) {
+      printf("clCreateCommandQueue failed with error code %d\n", err);
       goto FAIL;
     }
 #endif
