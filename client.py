@@ -53,11 +53,6 @@ config.read('client.conf')
 payout_address = config_safe_get_str(config, 'DEFAULT', 'address')
 desired_work_type = config_safe_get_str(config, 'DEFAULT','work_type')
 
-if desired_work_type not in WORK_TYPES:
-    print('Invalid work_type set in config ( {} ). Choose from {} '.format(desired_work_type, WORK_TYPES))
-    sys.exit()
-
-
 # get arguments that were not given via config file
 parser = argparse.ArgumentParser()
 parser.add_argument('--address', type=str, required=(len(payout_address)==0), metavar='XRB/NANO_ADDRESS', help='Payout address.')
@@ -67,6 +62,11 @@ args = parser.parse_args()
 
 if args.address: payout_address = args.address
 if args.work_type: desired_work_type = args.work_type
+
+# check if valid work type (should be handled by argparse, but not by the configparse
+if desired_work_type not in WORK_TYPES:
+    print('Invalid work_type set in config ( {} ). Choose from {} '.format(desired_work_type, WORK_TYPES))
+    sys.exit()
 
 print("Welcome to Distributed Nano Proof of Work System")
 print("All payouts will go to %s" % payout_address)
