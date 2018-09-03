@@ -1,4 +1,4 @@
-import requests, argparse, ctypes, time, sys, configparser, json
+import requests, argparse, time, sys, configparser, json, mpow
 import websocket #websocket-client, exceptions
 from websocket import create_connection
 from datetime import datetime # print timestamp
@@ -13,9 +13,7 @@ def get_socket():
     return ws
 
 def get_work_lib(from_hash):
-    lib=ctypes.CDLL("./libmpow.so")
-    lib.pow_generate.restype = ctypes.c_char_p
-    work = lib.pow_generate(ctypes.c_char_p(from_hash.encode("utf-8"))).decode("utf-8")
+    work = format(mpow.generate(bytes.fromhex(from_hash)), '016x')
     return work
 
 def get_work_node(from_hash):

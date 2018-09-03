@@ -1,8 +1,2 @@
 *.so
-*.cache
-*.log
-*.status
-mpow
-mpow.cl.bin
-configure
-makefile
+build/

@@ -3,35 +3,31 @@
 ## Installation
 
 ### Ubuntu
-`git clone https://github.com/jamescoxon/nano_distributed_pow_client.git`
-
+To use CPU you need the blake2 library.
 ```bash
-cd nano_distributed_pow_client
 sudo apt-get install libb2-dev
-autoconf
-./configure
-make
 ```
 
-To enable GPU,
-```
-sudo apt-get install ocl-icd-opencl-dev
-autoconf
-./configure --enable-gpu
-make
-```
-
-Optionally, compile executable
-`make mpow`
-
+To use GPU you need opencl library and ICD. Install the ICD that is relevant for your GPU.
 ```bash
-python3 client.py
-# Choose to compute PoW locally
+sudo apt-get install ocl-icd-opencl-dev
+sudo apt-get install nvidia-opencl-icd
+sudo apt-get install amd-opencl-icd
 ```
 
-#### Using GPU
+To install the library,
+```bash
+git clone https://github.com/jamescoxon/nano_distributed_pow_client.git`
+cd nano_distributed_pow_client
+sudo apt-get install python3-dev
+python3 setup.py build_ext --inplace
 
-Using a GPU is much faster, but it's not yet implemented directly in the client, so we'll use [nano-work-server](https://github.com/nanocurrency/nano-work-server/tree/master).
+python3 client.py
+```
+
+#### Using nano-work-server
+
+[nano-work-server](https://github.com/nanocurrency/nano-work-server/tree/master).
 
 - `sudo apt-get install cargo`
 
@@ -43,8 +39,7 @@ Run the client
 
 ```bash
 cd nano_distributed_pow_client
-python3 client.py
-# Choose to connect to the node
+python3 client.py --node
 ```
 
 ## Configuration
