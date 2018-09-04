@@ -49,4 +49,4 @@ python3 client.py
 
 ## Configuration
 
-You can optionally save your address in `client.conf`.
+See `client.conf` for configuration options. Alternatively use the command line when running the client. Do `python3 client.py --help` for instructions.
