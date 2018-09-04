@@ -20,7 +20,7 @@ To install the library,
 git clone https://github.com/jamescoxon/nano_distributed_pow_client.git`
 cd nano_distributed_pow_client
 sudo apt-get install python3-dev
-python3 setup.py build_ext --inplace
+python3 setup.py develop --user
 
 python3 client.py
 ```
