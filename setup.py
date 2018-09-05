@@ -19,7 +19,7 @@ else:
     eca = ['-fopenmp']
 
 setup(
-    name="nano-dpow",
+    name="nano-dpow-client",
     version='0.0.1',
     description='write a description',
     url='https://github.com/jamescoxon/nano_distributed_pow_client',
