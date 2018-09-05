@@ -21,10 +21,10 @@ else:
 setup(
     name="nano-dpow-client",
     version='0.0.1',
-    description='write a description',
+    description='Work client for the Nano (cryptocurrency) Distributed Proof of Work System. Supports CPU and GPU.',
     url='https://github.com/jamescoxon/nano_distributed_pow_client',
-    author='James',
-    author_email='add email',
+    author='James Coxon',
+    author_email='james@joltwallet.com',
     scripts=['client.py'],
     license='MIT',
     python_requires='>=3.0',
