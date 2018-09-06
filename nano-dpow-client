@@ -60,7 +60,7 @@ if __name__ == "__main__":
     parser.add_argument('--address', type=str, required=(len(payout_address)==0), metavar='XRB/NANO_ADDRESS', help='Payout address.')
     parser.add_argument('--work-type', type=str, action='store', choices=WORK_TYPES, required=False, metavar='WORK_TYPE', help='Desired work type. Options: any, urgent_only, precache_only (default).')
     parser.add_argument('--node', action='store_true', help='Compute work on the node. Default is to use libmpow.')
-    parser.add_argument('--save-opts', action='store_true', help='Save the current settings as default.')
+    parser.add_argument('--save-config', action='store_true', help='Save the current settings as default.')
     args = parser.parse_args()
 
     # argparse has priority
@@ -69,8 +69,8 @@ if __name__ == "__main__":
 
     # default value for work_type, cant be checked in argparse because there's no way to know if the arg was given or defaulted if precache_only was chosen
     if desired_work_type == '': desired_work_type = 'precache_only'
-    
-    if args.save_opts:
+
+    if args.save_config:
         config.set('DEFAULT', 'address', payout_address)
         config.set('DEFAULT', 'work_type', desired_work_type)
         with open(os.path.expanduser('~') + "/.nano-dpow-client.conf", 'w+') as f:

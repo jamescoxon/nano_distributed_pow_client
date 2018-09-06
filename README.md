@@ -1,8 +1,10 @@
 # nano_distributed_pow_client
 
+Welcome to the nano community's Distributed Proof of Work (DPoW) client. The DPoW system allows any user to support the nano network by computing the required work for transactions. This can help a lot of community-supported projects, such as faucets, tipping bots, and wallets.
+
 ## Installation
 
-### Ubuntu
+### Linux
 ```bash
 git clone https://github.com/jamescoxon/nano_distributed_pow_client.git`
 cd nano_distributed_pow_client
@@ -33,10 +35,12 @@ You can supply the flag `--user` to the install command if you want to install i
 
 #### Run the client
 ```bash
-nano-dpow-client
+nano-dpow-client --address YOUR_NANO_ADDRESS
 ```
 
 ### Using [nano-work-server](https://github.com/nanocurrency/nano-work-server)
+
+This is an alternative to building the libraries above.
 
 - `sudo apt-get install cargo`
 
@@ -47,9 +51,15 @@ nano-dpow-client
 Run the client
 
 ```bash
-nano-dpow-client --node
+nano-dpow-client --node --address YOUR_NANO_ADDRESS
 ```
 
 ## Configuration
 
-See `.nano-dpow-client-conf` for configuration options. The configuration file should be placed in the user's `$HOME` directory. Alternatively use the command line when running the client. Do `nano-dpow-client --help` for instructions.
+Run `nano-dpow-client --help` for configuration options. The address is mandatory, but not checked to be an existing nano account.
+
+To save your configuration, add `--save-config` when running the client. A configuration file `.nano-dpow-client.conf` will be placed in the user's `$HOME` directory. This can be manually modified.
+
+In case the same argument exists in the configuration file and is provided by argument, the argument takes priority.
+
+Your address is used to keep track of your work preferences, statistics, and to send small payouts in the future.
