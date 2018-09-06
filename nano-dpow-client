@@ -58,12 +58,16 @@ if __name__ == "__main__":
     # get arguments that were not given via config file
     parser = argparse.ArgumentParser()
     parser.add_argument('--address', type=str, required=(len(payout_address)==0), metavar='XRB/NANO_ADDRESS', help='Payout address.')
-    parser.add_argument('--work-type', type=str, action='store', choices=WORK_TYPES, required=(len(desired_work_type)==0), metavar='WORK_TYPE', help='Desired work type.')
+    parser.add_argument('--work-type', type=str, action='store', choices=WORK_TYPES, required=False, metavar='WORK_TYPE', help='Desired work type. Options: any, urgent_only, precache_only (default).')
     parser.add_argument('--node', action='store_true', help='Compute work on the node. Default is to use libmpow.')
     args = parser.parse_args()
 
+    # argparse has priority
     if args.address: payout_address = args.address
     if args.work_type: desired_work_type = args.work_type
+
+    # default value for work_type, cant be checked in argparse because there's no way to know if the arg was given or defaulted if precache_only was chosen
+    if desired_work_type == '': desired_work_type = 'precache_only'
 
     # check if valid work type (should be handled by argparse, but not by the configparse
     if desired_work_type not in WORK_TYPES:
