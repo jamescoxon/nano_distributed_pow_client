@@ -52,4 +52,4 @@ nano-dpow-client --node
 
 ## Configuration
 
-See `client.conf` for configuration options. Alternatively use the command line when running the client. Do `client --help` for instructions.
+See `.nano-dpow-client-conf` for configuration options. The configuration file should be placed in the user's `$HOME` directory. Alternatively use the command line when running the client. Do `client --help` for instructions.
