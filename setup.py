@@ -29,7 +29,7 @@ setup(
     url='https://github.com/jamescoxon/nano_distributed_pow_client',
     author='James Coxon',
     author_email='james@joltwallet.com',
-    scripts=['client'],
+    scripts=['nano-dpow-client'],
     license='MIT',
     python_requires='>=3.0',
     install_requires=[

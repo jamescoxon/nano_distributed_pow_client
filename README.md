@@ -33,7 +33,7 @@ You can supply the flag `--user` to the install command if you want to install i
 
 #### Run the client
 ```bash
-client
+nano-dpow-client
 ```
 
 ### Using [nano-work-server](https://github.com/nanocurrency/nano-work-server)
@@ -47,8 +47,7 @@ client
 Run the client
 
 ```bash
-cd nano_distributed_pow_client
-client --node
+nano-dpow-client --node
 ```
 
 ## Configuration
