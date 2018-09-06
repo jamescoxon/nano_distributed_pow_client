@@ -1,6 +1,10 @@
 from setuptools import setup, Extension
-import sys
+import sys, os
 
+
+os.environ["CC"] = "gcc"
+if sys.platform == 'darwin':
+    os.environ["CC"] = "gcc-8"
 
 eca = []
 ela = []
@@ -25,7 +29,7 @@ setup(
     url='https://github.com/jamescoxon/nano_distributed_pow_client',
     author='James Coxon',
     author_email='james@joltwallet.com',
-    scripts=['client.py'],
+    scripts=['client'],
     license='MIT',
     python_requires='>=3.0',
     install_requires=[

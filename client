@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import requests, argparse, time, sys, configparser, json, mpow
 import websocket #websocket-client, exceptions
 from websocket import create_connection
