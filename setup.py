@@ -33,7 +33,7 @@ setup(
     license='MIT',
     python_requires='>=3.0',
     install_requires=[
-    'websocket-client'],
+    'websocket-client', 'requests'],
     ext_modules=[
         Extension(
             'mpow',
