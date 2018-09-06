@@ -5,7 +5,7 @@ import websocket #websocket-client, exceptions
 from websocket import create_connection
 from datetime import datetime # print timestamp
 
-NODE_SERVER = ''#'ws://yapraiwallet.space:5000/group/'
+NODE_SERVER = 'ws://yapraiwallet.space:5000/group/'
 WORK_SERVER = 'http://%s:%s' % ('127.0.0.1', '7076')
 WORK_TYPES = ['urgent_only', 'precache_only', 'any']
 
