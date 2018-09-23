@@ -1,7 +1,7 @@
-# Configure address in client.conf before building the image to make all containers use the same address.
-# Otherwise, run the container with the ENV variable ADDRESS, example:
+# To build the image run:
 # docker build . -t pow
-# docker run -e ADDRESS=xrb_3wm37qz19zhei7nzscjcopbrbnnachs4p1gnwo5oroi3qonw6inwgoeuufdp pow
+# Then run the container with the ENV variable ADDRESS, example:
+# docker run -d -e ADDRESS=xrb_3wm37qz19zhei7nzscjcopbrbnnachs4p1gnwo5oroi3qonw6inwgoeuufdp pow
 
 FROM python:3
 
