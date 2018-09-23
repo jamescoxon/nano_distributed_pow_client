@@ -14,8 +14,7 @@ WORKDIR /usr/src/app
 
 COPY . .
 
-RUN autoconf
-RUN ./configure
-RUN make
+RUN python3 setup.py build
+RUN python3 setup.py install
 
-CMD python3 client.py || python3 client.py --address $ADDRESS
+CMD nano-dpow-client --address $ADDRESS
