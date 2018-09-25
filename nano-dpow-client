@@ -15,8 +15,8 @@ def get_socket():
     ws.settimeout(5.0) # this causes a TimeOutException after 5 seconds stuck in .recv()
     return ws
 
-def get_work_lib(from_hash):
-    work = format(mpow.generate(bytes.fromhex(from_hash)), '016x')
+def get_work_lib(from_hash, threshold='ffffffc000000000'):
+    work = format(mpow.generate(bytes.fromhex(from_hash), int(threshold, 16)), '016x')
     return work
 
 def get_work_node(from_hash):
