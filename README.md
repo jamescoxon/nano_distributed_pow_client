@@ -38,15 +38,15 @@ You can supply the flag `--user` to the install command if you want to install i
 nano-dpow-client --address YOUR_NANO_ADDRESS
 ```
 
-### Using [nano-work-server](https://github.com/nanocurrency/nano-work-server)
+### Using [dpow-work-server](https://github.com/guilhermelawless/dpow-work-server)
 
 This is an alternative to building the libraries above.
 
 - `sudo apt-get install cargo`
 
-- Follow instructions in [nano-work-server](https://github.com/nanocurrency/nano-work-server).
+- Follow instructions in [dpow-work-server](https://github.com/guilhermelawless/dpow-work-server).
 
-- Run nano-work-server: `./nano-work-server --gpu 0:0 --listen-address 127.0.0.1:7076`
+- Run nano-work-server: `./dpow-work-server --gpu 0:0 --listen-address 127.0.0.1:7076`
 
 Run the client
 
