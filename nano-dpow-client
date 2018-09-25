@@ -16,7 +16,7 @@ def get_socket():
     return ws
 
 def get_work_lib(from_hash):
-    work = format(mpow.generate(bytes.fromhex(from_hash)), '016x')
+    work = format(mpow.generate(bytes.fromhex(from_hash), int('ffffffc000000000', 16)), '016x')
     return work
 
 def get_work_node(from_hash):
