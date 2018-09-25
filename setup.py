@@ -1,10 +1,21 @@
 from setuptools import setup, Extension
 import sys, os
 
+def which(pgm):
+    path=os.getenv('PATH')
+    for p in path.split(os.path.pathsep):
+        p=os.path.join(p,pgm)
+        if os.path.exists(p) and os.access(p,os.X_OK):
+            return p
 
 os.environ["CC"] = "gcc"
 if sys.platform == 'darwin':
-    os.environ["CC"] = "gcc-8"
+    gcc=None
+    for i in range(9, 5, -1):
+        gcc = 'gcc-'+str(i)
+        if which(gcc):
+            os.environ["CC"] = gcc
+            break
 
 eca = []
 ela = []
