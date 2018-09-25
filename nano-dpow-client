@@ -8,6 +8,7 @@ from datetime import datetime # print timestamp
 NODE_SERVER = 'ws://yapraiwallet.space:5000/group/'
 WORK_SERVER = 'http://%s:%s' % ('127.0.0.1', '7076')
 WORK_TYPES = ['urgent_only', 'precache_only', 'any']
+NANO_THRESHOLD = 'ffffffc000000000'
 CONFIG_FILE = os.path.expanduser('~/.nano-dpow-client.conf')
 
 def get_socket():
@@ -15,12 +16,12 @@ def get_socket():
     ws.settimeout(5.0) # this causes a TimeOutException after 5 seconds stuck in .recv()
     return ws
 
-def get_work_lib(from_hash, threshold='ffffffc000000000'):
+def get_work_lib(from_hash, threshold):
     work = format(mpow.generate(bytes.fromhex(from_hash), int(threshold, 16)), '016x')
     return work
 
-def get_work_node(from_hash):
-    get_work = '{ "action" : "work_generate", "hash" : "%s", "use_peers": "true" }' % from_hash
+def get_work_node(from_hash, threshold):
+    get_work = '{ "action" : "work_generate", "hash" : "%s", "threshold": "%s", "use_peers": "true" }' % ( from_hash, threshold )
     r = requests.post(WORK_SERVER, data = get_work)
     resulting_work = r.json()
     work = resulting_work['work'].lower()
@@ -111,29 +112,38 @@ if __name__ == "__main__":
                 waiting = True
 
             try:
-                hash_result = json.loads(str(ws.recv()))
+                work_request = json.loads(str(ws.recv()))
                 waiting = False
             except websocket.WebSocketTimeoutException as e:
                 print('.', end='', flush=True)
                 continue
 
-            has_type = 'type' in hash_result
-            print("\n{} \tGot work ({})".format(datetime.now(), hash_result['type'] if has_type else 'unknown'))
+            has_type = 'type' in work_request
+            has_threshold = 'threshold' in work_request
+            print("\n{} \tGot work ({} - {})".format(datetime.now(),
+                                                     work_request['type'] if has_type else 'unknown',
+                                                     work_request['threshold'] if has_threshold else 'no_threshold'))
 
             # check if work type is the expected
-            if has_type and not is_desired_work_type(hash_result['type'], desired_work_type):
-                print("\t\t\t\t! Unexpected/Undesired work type: {}".format(hash_result['type']))
+            if has_type and not is_desired_work_type(work_request['type'], desired_work_type):
+                print("\t\t\t\t! Unexpected/Undesired work type: {}".format(work_request['type']))
+
+            # default to NANO difficulty if not provided
+            if not has_threshold:
+                work_th = NANO_THRESHOLD
+            else:
+                work_th = work_request['threshold']
 
             t = time.perf_counter()
 
             if not args.node:
-                work = get_work_lib(hash_result['hash'])
+                work = get_work_lib(work_request['hash'], work_th)
             else:
-                work = get_work_node(hash_result['hash'])
+                work = get_work_node(work_request['hash'], work_th)
 
             print("\t\t\t\t{} - took {:.2f}s".format(work, time.perf_counter()-t))
 
-            json_request = '{"hash" : "%s", "work" : "%s", "address" : "%s"}' % (hash_result['hash'], work, payout_address)
+            json_request = '{"hash" : "%s", "work" : "%s", "address" : "%s"}' % (work_request['hash'], work, payout_address)
             ws.send(json_request)
 
         except KeyboardInterrupt:
