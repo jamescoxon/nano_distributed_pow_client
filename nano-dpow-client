@@ -136,10 +136,14 @@ if __name__ == "__main__":
 
             t = time.perf_counter()
 
-            if not args.node:
-                work = get_work_lib(work_request['hash'], work_th)
-            else:
-                work = get_work_node(work_request['hash'], work_th)
+            try:
+                if not args.node:
+                    work = get_work_lib(work_request['hash'], work_th)
+                else:
+                    work = get_work_node(work_request['hash'], work_th)
+            except Exception as e:
+                print('Error while getting work - {}'.format(e))
+                work = 'error'
 
             print("\t\t\t\t{} - took {:.2f}s".format(work, time.perf_counter()-t))
 
