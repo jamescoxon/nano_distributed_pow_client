@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import requests, argparse, time, sys, configparser, json, mpow, os
+import requests, argparse, time, sys, configparser, json, os
 import websocket #websocket-client, exceptions
 from websocket import create_connection
 from datetime import datetime # print timestamp
@@ -90,6 +90,7 @@ if __name__ == "__main__":
     print("You have chosen to only do work of type %s" % desired_work_type)
     if not args.node:
         print("You have selected local PoW processor (libmpow)")
+        import mpow
     else:
         print("You have selected node PoW processor (work_server or nanocurrency node)")
     print('\n')
