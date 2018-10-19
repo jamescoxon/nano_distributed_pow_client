@@ -44,6 +44,37 @@ def config_safe_get_str(config, section, option):
     except:
         return ''
 
+
+class Stats(object):
+    def __init__(self, time_window):
+        assert time_window > 0
+        print('Stats - using time window of {:d} seconds'.format(time_window))
+        if time_window < 30:
+            print('Use at least a window of 30 seconds for accurate benchmarking')
+            sys.exit(1)
+        self.time_window = time_window
+
+        self.times = list()
+        self.last_tick = time.perf_counter()
+
+    def get_window_perf_ratio(self):
+        if len(self.times) < 2:
+            raise Exception("Not enough measurements")
+        # assumes sorted list, which it should be if time does not go backwards
+        delta_t = self.times[-1][0] - self.times[0][0]
+        sum_work = sum( [work_time for (stamp,work_time) in self.times] )
+        return sum_work / float(delta_t)
+
+    def clear_old(self):
+        oldest_allowed = time.time() - self.time_window
+        self.times = [ (stamp, work_time) for (stamp,work_time) in self.times if stamp > oldest_allowed ]
+
+    def update(self, work_time):
+        self.clear_old()
+        self.times.append( (time.time(), work_time ) )
+        return self
+
+
 # ---- MAIN ---- #
 
 if __name__ == "__main__":
@@ -93,7 +124,6 @@ if __name__ == "__main__":
         import mpow
     else:
         print("You have selected node PoW processor (work_server or nanocurrency node)")
-    print('\n')
 
     try:
         ws = get_socket()
@@ -102,8 +132,11 @@ if __name__ == "__main__":
         ws.send(set_work_type)
 
     except Exception as e:
-        print('\nError - unable to connect to backend server\nTry again later or change the server in config.ini')
+        print('\nError - unable to connect to backend server\nTry again later or change the server in config.ini.\n{}'.format(e))
         sys.exit()
+
+    stats = Stats(2*60) # 2 minutes window
+    print('\n')
 
     waiting = False
     while 1:
@@ -146,7 +179,14 @@ if __name__ == "__main__":
                 print('Error while getting work - {}'.format(e))
                 work = 'error'
 
-            print("\t\t\t\t{} - took {:.2f}s".format(work, time.perf_counter()-t))
+            work_time = time.perf_counter()-t
+            print("\t\t\t\t{} - took {:.2f}s".format(work, work_time))
+
+            try:
+                ratio = stats.update(work_time).get_window_perf_ratio()
+                print("\t\t\t\tUsage ({:d}s) = {:.2f}%".format(stats.time_window, ratio*100.0))
+            except:
+                pass
 
             json_request = '{"hash" : "%s", "work" : "%s", "address" : "%s"}' % (work_request['hash'], work, payout_address)
             ws.send(json_request)
