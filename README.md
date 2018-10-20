@@ -6,7 +6,7 @@ Welcome to the nano community's Distributed Proof of Work (DPoW) client. The DPo
 
 ### Linux
 ```bash
-git clone https://github.com/jamescoxon/nano_distributed_pow_client.git`
+git clone https://github.com/jamescoxon/nano_distributed_pow_client.git
 cd nano_distributed_pow_client
 sudo apt-get install python3-dev
 ```
