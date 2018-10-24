@@ -6,7 +6,6 @@ from websocket import create_connection
 from datetime import datetime # print timestamp
 
 NODE_SERVER = 'ws://yapraiwallet.space:5000/group/'
-WORK_SERVER = 'http://%s:%s' % ('127.0.0.1', '7076')
 WORK_TYPES = ['urgent_only', 'precache_only', 'any']
 NANO_THRESHOLD = 'ffffffc000000000'
 CONFIG_FILE = os.path.expanduser('~/.nano-dpow-client.conf')
@@ -20,9 +19,9 @@ def get_work_lib(from_hash, threshold):
     work = format(mpow.generate(bytes.fromhex(from_hash), int(threshold, 16)), '016x')
     return work
 
-def get_work_node(from_hash, threshold):
+def get_work_node(server, from_hash, threshold):
     get_work = '{ "action" : "work_generate", "hash" : "%s", "threshold": "%s", "use_peers": "true" }' % ( from_hash, threshold )
-    r = requests.post(WORK_SERVER, data = get_work)
+    r = requests.post(server, data = get_work)
     resulting_work = r.json()
     work = resulting_work['work'].lower()
     return work
@@ -94,7 +93,11 @@ if __name__ == "__main__":
     parser.add_argument('--work-type', type=str, action='store', choices=WORK_TYPES, required=False, metavar='WORK_TYPE', help='Desired work type. Options: any, urgent_only, precache_only (default).')
     parser.add_argument('--node', action='store_true', help='Compute work on the node. Default is to use libmpow.')
     parser.add_argument('--save-config', action='store_true', help='Save the current settings as default.')
+    parser.add_argument('--worker-ip', type=str, default='127.0.0.1', help='The URI of the work-server')
+    parser.add_argument('--worker-port', type=int, default='7076', help='The port where the work-server is listening for RPC calls')
     args = parser.parse_args()
+
+    work_server = "http://{}:{}".format(args.worker_ip , str(args.worker_port))
 
     # argparse has priority
     if args.address: payout_address = args.address
@@ -174,7 +177,7 @@ if __name__ == "__main__":
                 if not args.node:
                     work = get_work_lib(work_request['hash'], work_th)
                 else:
-                    work = get_work_node(work_request['hash'], work_th)
+                    work = get_work_node(work_server, work_request['hash'], work_th)
             except Exception as e:
                 print('Error while getting work - {}'.format(e))
                 work = 'error'
