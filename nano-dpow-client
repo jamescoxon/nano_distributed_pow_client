@@ -123,7 +123,7 @@ if __name__ == "__main__":
 
     print("Welcome to Distributed Nano Proof of Work System")
     print("All payouts will go to %s" % payout_address)
-    print("You have chosen to only do work of type %s" % desired_work_type)
+    print("You have chosen to do work of type %s" % desired_work_type)
     if not args.node:
         print("You have selected local PoW processor (libmpow)")
         import mpow
@@ -132,9 +132,25 @@ if __name__ == "__main__":
 
     try:
         ws = get_socket()
+        ws.settimeout(2.0)
 
         set_work_type = '{"work_type" : "%s", "address": "%s"}' % (desired_work_type, payout_address)
         ws.send(set_work_type)
+
+        # sent work type, wait for ok/failed
+        print('Getting setup confirmation from server')
+        try:
+            setup_json = json.loads(str(ws.recv()))
+            status = setup_json['status']
+            if status != 'success':
+                raise KeyError
+            else:
+                print('Setup ok!')
+        except websocket.WebSocketTimeoutException as e:
+            print('Nothing received, will continue.')
+        except KeyError:
+            print('Did not receive a valid setup confirmation from the server:\n{}'.format(setup_json))
+            #sys.exit(1)
 
     except Exception as e:
         print('\nError - unable to connect to backend server\nTry again later or change the server in config.ini.\n{}'.format(e))
@@ -143,6 +159,7 @@ if __name__ == "__main__":
     stats = Stats(2*60) # 2 minutes window
     print('\n')
 
+    ws.settimeout(20.0)
     waiting = False
     while 1:
         try:
