@@ -77,18 +77,9 @@ class Stats(object):
 
 if __name__ == "__main__":
 
-    payout_address = ''
-    desired_work_type = ''
-
-    # get arguments with config file first
-    config = configparser.ConfigParser()
-    config.read(CONFIG_FILE)
-    payout_address = config_safe_get_str(config, 'DEFAULT', 'address')
-    desired_work_type = config_safe_get_str(config, 'DEFAULT','work_type')
-
     # get arguments that were not given via config file
     parser = argparse.ArgumentParser()
-    parser.add_argument('--address', type=str, required=(len(payout_address)==0), metavar='XRB/NANO_ADDRESS', help='Payout address.')
+    parser.add_argument('--address', type=str, required=False, metavar='XRB/NANO_ADDRESS', help='Payout address.')
     parser.add_argument('--work-type', type=str, action='store', choices=WORK_TYPES, required=False, metavar='WORK_TYPE', help='Desired work type. Options: any, urgent_only, precache_only (default).')
     parser.add_argument('--node', action='store_true', help='Compute work on the node. Default is to use libmpow.')
     parser.add_argument('--save-config', action='store_true', help='Save the current settings as default.')
@@ -100,9 +91,19 @@ if __name__ == "__main__":
 
     work_server = "http://{}:{}".format(args.worker_ip , str(args.worker_port))
     dpow_server = args.dpow_server
-    # argparse has priority
-    if args.address: payout_address = args.address
-    if args.work_type: desired_work_type = args.work_type
+
+    # parse config file
+    config = configparser.ConfigParser()
+    config.read(CONFIG_FILE)
+
+    # argparse has priority, if not given go for config file
+    payout_address = args.address or config_safe_get_str(config, 'DEFAULT', 'address')
+    desired_work_type = args.work_type or config_safe_get_str(config, 'DEFAULT','work_type')
+
+    # payout address required
+    if not payout_address:
+        print('The payout address is required (use --address YOUR_NANO_ADDRESS)')
+        sys.exit()
 
     # default value for work_type, cant be checked in argparse because there's no way to know if the arg was given or defaulted if precache_only was chosen
     if desired_work_type == '': desired_work_type = 'precache_only'
