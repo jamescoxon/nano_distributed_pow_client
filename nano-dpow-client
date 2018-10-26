@@ -56,12 +56,8 @@ class Stats(object):
         self.last_tick = time.perf_counter()
 
     def get_window_perf_ratio(self):
-        if len(self.times) < 2:
-            raise Exception("Not enough measurements")
-        # assumes sorted list, which it should be if time does not go backwards
-        delta_t = self.times[-1][0] - self.times[0][0]
         sum_work = sum( [work_time for (stamp,work_time) in self.times] )
-        return sum_work / float(delta_t)
+        return sum_work / float(self.time_window)
 
     def clear_old(self):
         oldest_allowed = time.time() - self.time_window
