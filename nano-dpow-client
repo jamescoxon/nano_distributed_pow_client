@@ -8,6 +8,7 @@ from datetime import datetime # print timestamp
 WORK_TYPES = ['urgent_only', 'precache_only', 'any']
 NANO_THRESHOLD = 'ffffffc000000000'
 CONFIG_FILE = os.path.expanduser('~/.nano-dpow-client.conf')
+GET_SETUP_CONFIRMATION = False
 
 def get_socket():
     ws = create_connection(dpow_server)
@@ -133,20 +134,21 @@ if __name__ == "__main__":
         set_work_type = '{"work_type" : "%s", "address": "%s"}' % (desired_work_type, payout_address)
         ws.send(set_work_type)
 
-        # sent work type, wait for ok/failed
-        print('Getting setup confirmation from server')
-        try:
-            setup_json = json.loads(str(ws.recv()))
-            status = setup_json['status']
-            if status != 'success':
-                raise KeyError
-            else:
-                print('Setup ok!')
-        except websocket.WebSocketTimeoutException as e:
-            print('Nothing received, will continue.')
-        except KeyError:
-            print('Did not receive a valid setup confirmation from the server:\n{}'.format(setup_json))
-            #sys.exit(1)
+        if GET_SETUP_CONFIRMATION:
+            # sent work type, wait for ok/failed
+            print('Getting setup confirmation from server')
+            try:
+                setup_json = json.loads(str(ws.recv()))
+                status = setup_json['status']
+                if status != 'success':
+                    raise KeyError
+                else:
+                    print('Setup ok!')
+            except websocket.WebSocketTimeoutException as e:
+                print('Nothing received, will continue.')
+            except KeyError:
+                print('Did not receive a valid setup confirmation from the server:\n{}'.format(setup_json))
+                #sys.exit(1)
 
     except Exception as e:
         print('\nError - unable to connect to backend server\nTry again later or change the server in config.ini.\n{}'.format(e))
