@@ -196,21 +196,20 @@ if __name__ == "__main__":
                 else:
                     work = get_work_node(work_server, work_request['hash'], work_th)
             except Exception as e:
-                print('Error while getting work - {}'.format(e))
                 print(work_request)
-                work = 'error'
+                raise Exception('While getting work - {}'.format(e))
+            else:
+                work_time = time.perf_counter()-t
+                print("\t\t\t\t{} - took {:.2f}s".format(work, work_time))
 
-            work_time = time.perf_counter()-t
-            print("\t\t\t\t{} - took {:.2f}s".format(work, work_time))
+                try:
+                    ratio = stats.update(work_time).get_window_perf_ratio()
+                    print("\t\t\t\tUsage ({:d}s) = {:.2f}%".format(stats.time_window, ratio*100.0))
+                except:
+                    pass
 
-            try:
-                ratio = stats.update(work_time).get_window_perf_ratio()
-                print("\t\t\t\tUsage ({:d}s) = {:.2f}%".format(stats.time_window, ratio*100.0))
-            except:
-                pass
-
-            json_request = '{"hash" : "%s", "work" : "%s", "address" : "%s"}' % (work_request['hash'], work, payout_address)
-            ws.send(json_request)
+                json_request = '{"hash" : "%s", "work" : "%s", "address" : "%s"}' % (work_request['hash'], work, payout_address)
+                ws.send(json_request)
 
         except KeyboardInterrupt:
             print("\nCtrl-C detected, canceled by user\n")
