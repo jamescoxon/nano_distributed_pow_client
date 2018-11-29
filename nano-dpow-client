@@ -197,6 +197,7 @@ if __name__ == "__main__":
                     work = get_work_node(work_server, work_request['hash'], work_th)
             except Exception as e:
                 print('Error while getting work - {}'.format(e))
+                print(work_request)
                 work = 'error'
 
             work_time = time.perf_counter()-t
