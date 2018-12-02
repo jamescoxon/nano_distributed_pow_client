@@ -98,6 +98,8 @@ Now you can run the DPoW client normally>
 
   ```nano-dpow-client --node --address YOUR_NANO_ADDRESS```
 
-- If you are using your GPU, consider only computing on demand work by adding `--work-type urgent_only`.
+About the two types of clients, doing **on demand** or **precached** work:
 
-- If you using CPU, you will be timed out from on demand work if you can't complete it within 6 seconds. These clients are still very useful, but should add `--work-type precache_only` so that they only compute precache work, which has no time restrictions.
+- If you are using your GPU, consider only computing on demand work by adding --work-type urgent_only. This is the type of work that needs to be computed as soon as possible.
+
+- If you are using CPU, you will be timed out from on demand work if you can't complete it within 6 seconds. These clients are still very useful, but should add --work-type precache_only so that they only compute precache work, which has no time restrictions.
