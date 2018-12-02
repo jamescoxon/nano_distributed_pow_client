@@ -4,6 +4,10 @@ Welcome to the nano community's Distributed Proof of Work (DPoW) client. The DPo
 
 ## Installation
 
+### Windows
+
+See [the Windows instructions](windows_instructions.md) for W10 x64.
+
 ### Linux
 ```bash
 git clone https://github.com/jamescoxon/nano_distributed_pow_client.git
@@ -56,10 +60,16 @@ nano-dpow-client --node --address YOUR_NANO_ADDRESS
 
 ## Configuration
 
+About the two types of clients, doing **on demand** or **precached** work:
+
+- If you are using your GPU, consider only computing on demand work by adding --work-type urgent_only. This is the type of work that needs to be computed as soon as possible.
+
+- If you are using CPU, you will be timed out from on demand work if you can't complete it within 6 seconds. These clients are still very useful, but should add --work-type precache_only so that they only compute precache work, which has no time restrictions.
+
 Run `nano-dpow-client --help` for configuration options. The address is mandatory, but not checked to be an existing nano account.
 
 To save your configuration, add `--save-config` when running the client. A configuration file `.nano-dpow-client.conf` will be placed in the user's `$HOME` directory. This can be manually modified.
 
 In case the same argument exists in the configuration file and is provided by argument, the argument takes priority.
 
-Your address is used to keep track of your work preferences, statistics, and to send small payouts in the future.
+Your address is used to keep track of your work preferences, statistics, and to send payouts.
