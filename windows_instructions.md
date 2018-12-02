@@ -2,7 +2,7 @@
 
 This installations are for Windows 10 x64 and using a GPU. Adapting to use CPU is fine, but please run as a precache client only, which does not have time restrictions.
 
-Huge thanks to laswerwean for the [original instructions](https://www.reddit.com/r/nanocurrency/comments/a25m8y/howto_run_distributed_pow_service_using_gpu_on/), which were adapted for completeness.
+Huge thanks to laserwean for the [original instructions](https://www.reddit.com/r/nanocurrency/comments/a25m8y/howto_run_distributed_pow_service_using_gpu_on/), which were adapted for completeness.
 
 ## Download install, and configure the Node and Developer Wallet
 
@@ -68,7 +68,7 @@ This assumes you only want to use the node for DPoW.
 
 3. Install [Ubuntu from Windows Store](https://www.microsoft.com/en-us/p/ubuntu/9nblggh4msv6).
 
-4. Run Ubuntu from the start menu and finish its setup, see [this](https://i.redd.it/s47tkjaelp121.png) image.
+4. Run Ubuntu from the start menu and finish its setup, see [this](https://i.redd.it/ghpd74y9kp121.png) image.
 
 ## Configure and run DPoW
 
