@@ -1,6 +1,6 @@
 # Windows installation instructions
 
-This installations are for Windows 10 x64 and using a GPU. Adapting to use CPU is fine, but please run as a precache client only, which does not have time restrictions.
+These instructions are for Windows 10 x64 and using a GPU. Adapting to use CPU is fine, but please run as a precache client only, which does not have time restrictions.
 
 Huge thanks to laserwean for the [original instructions](https://www.reddit.com/r/nanocurrency/comments/a25m8y/howto_run_distributed_pow_service_using_gpu_on/), which were adapted for completeness.
 
