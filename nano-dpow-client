@@ -176,7 +176,7 @@ if __name__ == "__main__":
             has_threshold = 'threshold' in work_request
             print("\n{} \tGot work ({} - {})".format(datetime.now(),
                                                      work_request['type'] if has_type else 'unknown',
-                                                     work_request['threshold'] if has_threshold else 'no_threshold'))
+                                                     work_request['threshold'] if has_threshold else 'no_threshold'), flush=True)
 
             # check if work type is the expected
             if has_type and not is_desired_work_type(work_request['type'], desired_work_type):
