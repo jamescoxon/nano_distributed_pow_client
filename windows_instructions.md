@@ -28,9 +28,15 @@ If you change your mind later, go into your firewall (default in Windows 10 is t
 2. Hit Start->Run (or Win+R) and write: `%LOCALAPPDATA%\RaiBlocks` , hit enter. It should open your file explorer.
 3. Delete all files inside except config.json
 4. Open Task Manager, and go into the Performance tab. There should be a GPU 0 device there, and maybe a GPU 1 if you have an integrated GPU as 0. Note here the number for the GPU you want to use.
-5. Change the following in config.json (note *GPU_ID_FROM_TASK_MANAGER* that you should change for 0 or 1, according to your case):
+5. Change the following in config.json (note *GPU_ID_FROM_TASK_MANAGER* that you should change for 0 or 1, according to your case, i think):
 
   ```json
+  "preconfigured_peers": [
+    "localhost"
+  ],
+  
+  (...)
+
   "rpc": {
     "address": "::ffff:0.0.0.0",
         "port": "7076",
@@ -42,8 +48,8 @@ If you change your mind later, go into your firewall (default in Windows 10 is t
     "rpc_enable": "true",
     "opencl_enable": "true",
     "opencl": {
-        "platform": "0",
-        "device": "GPU_ID_FROM_TASK_MANAGER",
+        "platform": "GPU_ID_FROM_TASK_MANAGER",
+        "device": "0",
         "threads": "1048576"
     }
   ```
