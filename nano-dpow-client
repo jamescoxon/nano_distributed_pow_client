@@ -8,10 +8,11 @@ from datetime import datetime # print timestamp
 WORK_TYPES = ['urgent_only', 'precache_only', 'any']
 NANO_THRESHOLD = 'ffffffc000000000'
 CONFIG_FILE = os.path.expanduser('~/.nano-dpow-client.conf')
+TIMEOUT_RECONNECT = 5*60 # this timeout prevents the client being shadow disconnected
 
 def get_socket():
     ws = create_connection(dpow_server)
-    ws.settimeout(5.0) # this causes a TimeOutException after 5 seconds stuck in .recv()
+    ws.settimeout(20.0) # this causes a TimeOutException after 20 seconds stuck in .recv()
     return ws
 
 def get_work_lib(from_hash, threshold):
@@ -138,8 +139,8 @@ if __name__ == "__main__":
 
     stats = Stats(2*60) # 2 minutes window
 
-    ws.settimeout(20.0)
     waiting = True
+    time_last_msg = time.time()
     while 1:
         try:
             if not waiting:
@@ -149,9 +150,22 @@ if __name__ == "__main__":
             try:
                 work_request = json.loads(str(ws.recv()))
                 waiting = False
+                time_last_msg = time.time()
             except websocket.WebSocketTimeoutException as e:
-                print('.', end='', flush=True)
-                ws.ping()
+                if time.time() - time_last_msg > TIMEOUT_RECONNECT:
+                    print("Too long since a server message, reconnecting...")
+                    try:
+                        del ws
+                        ws = get_socket()
+                        set_work_type = '{"work_type" : "%s", "address": "%s"}' % (desired_work_type, payout_address)
+                        ws.send(set_work_type)
+                        print("Connected")
+                        time_last_msg = time.time()
+                    except:
+                        pass
+                else:
+                    print('.', end='', flush=True)
+                    ws.ping()
                 continue
 
             is_work = 'hash' in work_request
@@ -207,6 +221,7 @@ if __name__ == "__main__":
             print("Reconnecting in 15 seconds...")
             time.sleep(15)
             try:
+                del ws
                 ws = get_socket()
                 set_work_type = '{"work_type" : "%s", "address": "%s"}' % (desired_work_type, payout_address)
                 ws.send(set_work_type)
