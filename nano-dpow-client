@@ -82,7 +82,7 @@ if __name__ == "__main__":
     parser.add_argument('--save-config', action='store_true', help='Save the current settings as default.')
     parser.add_argument('--worker-ip', type=str, default='127.0.0.1', help='The IP of the work-server listening for RPC calls')
     parser.add_argument('--worker-port', type=int, default='7076', help='The port where the work-server is listening for RPC calls')
-    parser.add_argument('--dpow-server', type=str, default='ws://yapraiwallet.space:5000/group/', help='The full URI of the DPoW server to connect to')
+    parser.add_argument('--dpow-server', type=str, default='wss://yapraiwallet.space/group/', help='The full URI of the DPoW server to connect to')
 
     args = parser.parse_args()
 
