@@ -156,7 +156,6 @@ if __name__ == "__main__":
                     print("Too long since a server message, reconnecting...")
                     try:
                         ws.close()
-                        del ws
                         ws = get_socket()
                         set_work_type = '{"work_type" : "%s", "address": "%s"}' % (desired_work_type, payout_address)
                         ws.send(set_work_type)
@@ -177,7 +176,6 @@ if __name__ == "__main__":
                     time.sleep(2)
                     try:
                         ws.close()
-                        del ws
                         ws = get_socket()
                         set_work_type = '{"work_type" : "%s", "address": "%s"}' % (desired_work_type, payout_address)
                         ws.send(set_work_type)
@@ -236,8 +234,9 @@ if __name__ == "__main__":
             print("Reconnecting in 15 seconds...")
             time.sleep(15)
             try:
-                ws.close()
-                del ws
+                if ws:
+                    ws.close()
+                    ws = None
                 ws = get_socket()
                 set_work_type = '{"work_type" : "%s", "address": "%s"}' % (desired_work_type, payout_address)
                 ws.send(set_work_type)
