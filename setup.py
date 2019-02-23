@@ -35,7 +35,7 @@ else:
 
 setup(
     name="nano-dpow-client",
-    version='1.1.0',
+    version='1.1.1',
     description='Work client for the Nano (cryptocurrency) Distributed Proof of Work System. Supports CPU and GPU.',
     url='https://github.com/jamescoxon/nano_distributed_pow_client',
     author='James Coxon',
