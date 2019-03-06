@@ -25,18 +25,12 @@ If you change your mind later, go into your firewall (default in Windows 10 is t
 ### Configure
 
 1. Close the wallet and **wait 30 seconds**. Kill *nano_wallet.exe* in Task Manager if it's still there.
-2. Hit Start->Run (or Win+R) and write: `%LOCALAPPDATA%\RaiBlocks` , hit enter. It should open your file explorer.
+2. Hit Start->Run (or Win+R) and write: `%LOCALAPPDATA%\Nano` , hit enter. It should open your file explorer.
 3. Delete all files inside except config.json
 4. Open Task Manager, and go into the Performance tab. There should be a GPU 0 device there, and maybe a GPU 1 if you have an integrated GPU as 0. Note here the number for the GPU you want to use.
 5. Change the following in config.json (note *GPU_ID_FROM_TASK_MANAGER* that you should change for 0 or 1, according to your case, i think):
 
-  ```json
-  "preconfigured_peers": [
-    "localhost"
-  ],
-  
-  (...)
-
+```json
   "rpc": {
     "address": "::ffff:0.0.0.0",
         "port": "7076",
@@ -52,6 +46,18 @@ If you change your mind later, go into your firewall (default in Windows 10 is t
         "device": "0",
         "threads": "1048576"
     }
+  }
+
+  "node": {
+    "peering_port": "0",
+
+    "preconfigured_peers": [
+      "localhost"
+    ],
+
+   "bootstrap_connections": "0",
+   "bootstrap_connections_max": "0",
+  }
   ```
 
 6. Save and close the file.
