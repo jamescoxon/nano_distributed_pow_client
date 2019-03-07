@@ -30,8 +30,8 @@ if '--enable-gpu' in sys.argv:
         macros = [('HAVE_OPENCL_OPENCL_H', '1')]
         ela=['-framework', 'OpenCL']
 else:
-    libs = ['b2']
     eca = ['-fopenmp']
+    ela=['-fopenmp']
 
 setup(
     name="nano-dpow-client",
@@ -48,7 +48,7 @@ setup(
     ext_modules=[
         Extension(
             'mpow',
-            sources=['mpow.c'],
+            sources=['b2b/blake2b.c', 'mpow.c'],
             extra_compile_args=eca,
             extra_link_args=ela,
             libraries=libs,

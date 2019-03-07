@@ -16,9 +16,8 @@ sudo apt-get install python3-dev
 ```
 
 #### Build
-To use CPU you need the blake2 library.
+To use CPU.
 ```bash
-sudo apt-get install libb2-dev
 python3 setup.py build
 ```
 
