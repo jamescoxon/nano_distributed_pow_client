@@ -24,25 +24,25 @@ libs = []
 macros = []
 src = []
 
-if '--use-vc' in sys.argv:
-    sys.argv.remove('--use-vc')
-    macros = [('USE_VISUAL_C', '1')]
-    eca = ['/openmp', '/arch:SSE2', '/arch:AVX', '/arch:AVX2']
-    ela = ['/openmp', '/arch:SSE2', '/arch:AVX', '/arch:AVX2']
-    src = ['b2b/blake2b.c', 'mpow.c']
+if '--enable-gpu' in sys.argv:
+    sys.argv.remove('--enable-gpu')
+    if '--use-vc' in sys.argv:
+        sys.argv.remove('--use-vc')
+    libs = ['OpenCL']
+    macros = [('HAVE_CL_CL_H', '1')]
+    if sys.platform == 'darwin':
+        macros = [('HAVE_OPENCL_OPENCL_H', '1')]
+        ela=['-framework', 'OpenCL']
+    src = ['mpow.c']
 else:
-    if '--enable-gpu' in sys.argv:
-        sys.argv.remove('--enable-gpu')
-        libs = ['OpenCL']
-        macros = [('HAVE_CL_CL_H', '1')]
-        if sys.platform == 'darwin':
-            macros = [('HAVE_OPENCL_OPENCL_H', '1')]
-            ela=['-framework', 'OpenCL']
-        src = ['mpow.c']
-    else:
-        eca = ['-fopenmp']
-        ela=['-fopenmp']
-        src = ['b2b/blake2b.c', 'mpow.c']
+    eca = ['-fopenmp']
+    ela=['-fopenmp']
+    src = ['b2b/blake2b.c', 'mpow.c']
+    if '--use-vc' in sys.argv:
+        sys.argv.remove('--use-vc')
+        macros = [('USE_VISUAL_C', '1')]
+        eca = ['/openmp', '/arch:SSE2', '/arch:AVX', '/arch:AVX2']
+        ela = ['/openmp', '/arch:SSE2', '/arch:AVX', '/arch:AVX2']
 
 setup(
     name="nano-dpow-client",
