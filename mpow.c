@@ -574,6 +574,9 @@ FAIL:
 #pragma omp parallel
 #pragma omp for
     for (i = 0; i < work_size; i++) {
+#ifdef USE_VISUAL_C
+      if (workb == 0) {
+#endif
       uint64_t r_str_l = r_str + i, b2b_b = 0;
       blake2b_state b2b;
 
@@ -584,12 +587,20 @@ FAIL:
 
       swapLong(&b2b_b);
 
+#ifdef USE_VISUAL_C
+        if (b2b_b >= difficulty) {
+#pragma omp critical
+          workb = r_str_l;
+        }
+      }
+#else
       if (b2b_b >= difficulty) {
 #pragma omp atomic write
         workb = r_str_l;
 #pragma omp cancel for
       }
 #pragma omp cancellation point for
+#endif
     }
   }
 #endif

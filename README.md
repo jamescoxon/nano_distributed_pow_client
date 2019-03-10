@@ -26,7 +26,7 @@ To use GPU you need opencl library and ICD. Install the ICD that is relevant for
 sudo apt-get install ocl-icd-opencl-dev
 sudo apt-get install nvidia-opencl-icd
 sudo apt-get install amd-opencl-icd
-python3 setup.py build --enable-gpu
+USE_GPU=1 python3 setup.py build
 ```
 
 #### Install
