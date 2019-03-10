@@ -8,7 +8,8 @@ def which(pgm):
         if os.path.exists(p) and os.access(p,os.X_OK):
             return p
 
-os.environ["CC"] = "gcc"
+if sys.platform != 'win32':
+    os.environ["CC"] = "gcc"
 if sys.platform == 'darwin':
     gcc=None
     for i in range(9, 5, -1):
