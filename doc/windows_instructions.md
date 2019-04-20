@@ -55,7 +55,7 @@ Excecute the follwing commands within your ubuntu windows (one after the other, 
 Test work generation (the node must be running). Your output should be similar to [this](https://i.redd.it/xjnrrr1pnp121.png):
 
   ```
-  curl -sd '{ "action": "work_generate", "hash":"0" }' localhost:7076
+  curl -sd '{ "action": "work_generate", "hash":"3E7C5911880A5DB34D12FD1D306B572ED5C0363A28D11414650537FE8BBBD174" }' localhost:7076
   ```
   
 Now you can run the DPoW client normally>
