@@ -6,7 +6,7 @@ Welcome to the nano community's Distributed Proof of Work (DPoW) client. The DPo
 
 ### Windows
 
-See [the Windows instructions](windows_instructions.md) for W10 x64.
+See [the Windows instructions](doc/windows_instructions.md) for W10 x64.
 
 ### Linux
 ```bash
