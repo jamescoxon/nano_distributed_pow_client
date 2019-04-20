@@ -6,7 +6,7 @@ from websocket import create_connection
 from datetime import datetime # print timestamp
 
 WORK_TYPES = ['urgent_only', 'precache_only', 'any']
-NANO_THRESHOLD = 'ffffffc000000000'
+NANO_DIFFICULTY = 'ffffffc000000000'
 CONFIG_FILE = os.path.expanduser('~/.nano-dpow-client.conf')
 TIMEOUT_RECONNECT = 5*60 # this timeout prevents the client being shadow disconnected
 
@@ -15,12 +15,12 @@ def get_socket():
     ws.settimeout(20.0) # this causes a TimeOutException after 20 seconds stuck in .recv()
     return ws
 
-def get_work_lib(from_hash, threshold):
-    work = format(mpow.generate(bytes.fromhex(from_hash), int(threshold, 16)), '016x')
+def get_work_lib(from_hash, difficulty):
+    work = format(mpow.generate(bytes.fromhex(from_hash), int(difficulty, 16)), '016x')
     return work
 
-def get_work_node(server, from_hash, threshold):
-    get_work = '{ "action" : "work_generate", "hash" : "%s", "threshold": "%s", "use_peers": "true" }' % ( from_hash, threshold )
+def get_work_node(server, from_hash, difficulty):
+    get_work = '{ "action" : "work_generate", "hash" : "%s", "difficulty": "%s", "use_peers": "true" }' % ( from_hash, difficulty )
     r = requests.post(server, data = get_work)
     resulting_work = r.json()
     work = resulting_work['work'].lower()
@@ -187,20 +187,20 @@ if __name__ == "__main__":
                 continue
 
             has_type = 'type' in work_request
-            has_threshold = 'threshold' in work_request
+            has_difficulty = 'difficulty' in work_request
             print("\n{} \tGot work ({} - {})".format(datetime.now(),
                                                      work_request['type'] if has_type else 'unknown',
-                                                     work_request['threshold'] if has_threshold else 'no_threshold'), flush=True)
+                                                     work_request['difficulty'] if has_difficulty else 'no_difficulty'), flush=True)
 
             # check if work type is the expected
             if has_type and not is_desired_work_type(work_request['type'], desired_work_type):
                 print("\t\t\t\t! Unexpected/Undesired work type: {}".format(work_request['type']))
 
             # default to NANO difficulty if not provided
-            if not has_threshold:
-                work_th = NANO_THRESHOLD
+            if not has_difficulty:
+                work_th = NANO_DIFFICULTY
             else:
-                work_th = work_request['threshold']
+                work_th = work_request['difficulty']
 
             t = time.perf_counter()
 
