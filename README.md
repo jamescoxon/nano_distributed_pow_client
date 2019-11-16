@@ -1,3 +1,4 @@
+# THIS IS DEPRECATED - PLEASE NOW USE [V3 DPOW](https://github.com/guilhermelawless/nano-dpow)
 # nano_distributed_pow_client
 
 Welcome to the nano community's Distributed Proof of Work (DPoW) client. The DPoW system allows any user to support the nano network by computing the required work for transactions. This can help a lot of community-supported projects, such as faucets, tipping bots, and wallets.
